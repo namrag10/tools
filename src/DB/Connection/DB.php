@@ -28,7 +28,7 @@ class DB {
 		}	
 	}
 	
-	public function run($CMD, $Params){
+	public function run($CMD, $Params = []){
 		$stmt = $this->PDOInstance->prepare($CMD);
 	
 		$stmt->execute($Params);
