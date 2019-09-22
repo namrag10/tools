@@ -1,5 +1,6 @@
 {
     "name": "rhysg/tools",
+    "license": "MIT",
     "require": {
         "guzzlehttp/guzzle": "~6.0"
     },
