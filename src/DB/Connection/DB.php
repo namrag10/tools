@@ -6,14 +6,17 @@ use PDO;
 
 
 class DB {
-	//test comment
-    public $Host, $DB, $Credentials, $charset, $PDOInstance;
+	
+    public $Host, $DB, $Credentials, $charset, $PDOInstance, $Command, $Params;
 
     public function __construct($DB, $Credentials = [], $host = "localhost", $charset = "utf8mb4"){
         $this->Host = $host;
         $this->DB = $DB;
         $this->Credentials = (sizeof($Credentials) > 0) ? array_values($Credentials) : ["", ""];
-        $this->charset = $charset;		
+		$this->charset = $charset;
+		
+		$this->Command = "";
+		$this->Params = [];
 	
 		$dsn = "mysql:host=$this->Host;dbname=$this->DB;charset=$this->charset";
 		$opt = [
@@ -26,19 +29,38 @@ class DB {
 			$this->PDOInstance = new PDO($dsn, $this->Credentials[0], $this->Credentials[1], $opt);
 		} catch (\PDOException $e) {
 		    throw new \PDOException($e->getMessage(), (int)$e->getCode());
-		}	
+		}
+		
 	}
 	
-	public function run($CMD, $Params = []){
-		$stmt = $this->PDOInstance->prepare($CMD);
+	public function run($CMD = null, $Params = []){
+		$this->setCMD($CMD, $Params);
+		$stmt = $this->PDOInstance->prepare($this->Command);
 	
-		$stmt->execute($Params);
+		$stmt->execute($this->Params);
 	
-		if($CMD[0] == "S" || $CMD[0] == "I" || $CMD[1] == "E"){
-			$row = $stmt->fetchAll();
-			return $row;
-		}elseif($CMD[0] =="D"){
-			return $stmt->rowCount();
-        }
+		switch($this->Command[0]){
+			case "S":
+				return $stmt->fetchAll();
+				break;
+			case "I":
+				return $this->PDOInstance->lastInsertId();
+				break;
+			case "D":
+				return $stmt->rowCount();
+				break;
+		}
+	}
+
+	public function setCMD($CMD, $Params = []){
+		if(!$CMD == null){
+			$this->Command = $CMD;
+			$this->Params = $Params;
+		}
+		return $this;
+	}
+
+	public function getCMD(){
+		return [$this->Command, $this->Params];
 	}
 }
