@@ -6,6 +6,7 @@ use PDO;
 
 
 class DB {
+	//test comment
     public $Host, $DB, $Credentials, $charset, $PDOInstance;
 
     public function __construct($DB, $Credentials = [], $host = "localhost", $charset = "utf8mb4"){
