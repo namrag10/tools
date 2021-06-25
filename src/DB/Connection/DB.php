@@ -40,13 +40,16 @@ class DB {
 		$stmt->execute($this->Params);
 	
 		switch($this->Command[0]){
+				// Only valid response is the Select statement
 			case "S":
 				return $stmt->fetchAll();
 				break;
 			case "I":
+				// Only valid response is the Insert statement
 				return $this->PDOInstance->lastInsertId();
 				break;
 			case "D":
+				// Only valid response is the Delete statement
 				return $stmt->rowCount();
 				break;
 		}
